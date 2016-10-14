@@ -41,5 +41,10 @@
       <arg name="lesson" type="s"/>
       <arg name="task" type="s"/>
     </signal>
+
+    <method name="PutFile">
+      <arg name="filename" direction="in" type="ay"/>
+      <arg name="target" direction="in" type="ay"/>
+    </method>
   </interface>
 <node>

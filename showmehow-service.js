@@ -14,7 +14,7 @@ const Gio = imports.gi.Gio;
 const Showmehow = imports.gi.Showmehow;
 
 /* This is a hack to cause Showmehow js resources to get loaded */
-const ShowmehowResource = imports.gi.Showmehow.get_resource();  // eslint-disable-line no-unused-vars
+const ShowmehowResource = imports.gi.Showmehow.get_resource();
 
 const Lang = imports.lang;
 
@@ -437,6 +437,30 @@ const _INPUT_SIDE_EFFECTS = {
                                                                   interestedInEvents.map((w) => [w])));
     }
 };
+/**
+ * putFileFromResource
+ *
+ * This tries to take a file from the "files" directory in gresource
+ * and put it in the filesystem.
+ */
+function putFileFromResource(fileInResource, target) {
+    let target_file = Gio.File.new_for_path (target);
+    let target_dir = Gio.File.get_parent ();
+    try {
+        target_dir.make_directory_with_parents(null)
+    } catch(e if e.matches(Gio.IOErrorEnum, Gio.IOErrorEnum.EXIST)) {
+        // directory already exists, fine
+    }
+    let in_stream = ShowmehowResource.open_stream('/files/' + filename,
+                                                  Gio.ResourceLookupFlags.NONE);
+    let out_stream = target_file.replace(null,
+                                         true,
+                                         Gio.FileCreateFlags.NONE,
+                                         null);
+    out_stream.splice (in_stream,
+                       Gio.OutputStreamSpliceFlags.CLOSE_SOURCE | Gio.OutputStreamSpliceFlags.CLOSE_TARGET,
+                       null);
+}
 
 const ShowmehowErrorDomain = GLib.quark_from_string('showmehow-error');
 const ShowmehowErrors = {
@@ -753,6 +777,17 @@ const ShowmehowService = new Lang.Class({
 
         return true;
     },
+
+    vfunc_handle_put_file: function(method, filename, target) {
+        try {
+            putFileFromResource(filename, target);
+            this.complete_put_file (method);
+        } catch (e) {
+            method.return_error_literal(ShowmehowErrorDomain,
+                                        ShowmehowErrors.INTERNAL_ERROR,
+                                        String(e));
+        }
+    }
 
     _validateAndFetchTask: function(lesson, task, method, success) {
         let task_detail;
