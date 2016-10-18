@@ -754,6 +754,18 @@ const ShowmehowService = new Lang.Class({
         return true;
     },
 
+    vfunc_handle_set_background: function(method, uri) {
+        let command = "gsettings set org.gnome.desktop.background picture-uri " + uri
+        try {
+            shell_executor(command);
+        } catch (e) {
+            method.return_error_literal(ShowmehowErrorDomain,
+                                        ShowmehowErrors.INTERNAL_ERROR,
+                                        String(e));
+        }
+        return true;
+    },
+
     _validateAndFetchTask: function(lesson, task, method, success) {
         let task_detail;
 
