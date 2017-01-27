@@ -133,6 +133,45 @@
         }
     },
     {
+        "name": "shell_extension",
+        "available_to": ["console"],
+        "desc": "Modify things in the shell.",
+        "entry": "extension_intro",
+        "practice": {
+            "extension_intro": {
+                "input": "console",
+                "mapper": ["shell",  "wait_message", "wrapped_output", {
+                    "type": "regex",
+                    "value": ".+"
+                }],
+                "example": {
+                    "success": "ok"
+                }
+            },
+            "extension_create": {
+                "input": "console",
+                "mapper": ["shell", "raw_output", {
+                    "type": "regex",
+                    "value": "^.*_.*$"
+                }],
+                "example": {
+                    "success": "eos-shell-extension-tool -c",
+                    "failure": "eos-shell-extension-tool"
+                }
+            },
+            "extension_modify": {
+                "input": "console",
+                "mapper": ["shell", "raw_output", {
+                    "type": "regex",
+                    "value": ".+"
+                }],
+                "example": {
+                    "success": "ok",
+                }
+            }
+        }
+    },
+    {
         "name": "joke",
         "available_to": ["console"],
         "desc": "Tell me a joke",
